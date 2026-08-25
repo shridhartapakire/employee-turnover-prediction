@@ -5,20 +5,48 @@ body {
     color: #1f2937;
 }
 
-.container {
-    max-width: 900px;
-    margin: 100px auto;
-    padding: 40px;
-    text-align: center;
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
     background: white;
-    border-radius: 12px;
 }
 
-h1 {
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.nav-links a {
+    margin-left: 25px;
+    text-decoration: none;
+    color: #1f2937;
+}
+
+.hero {
+    max-width: 900px;
+    margin: 120px auto;
+    padding: 40px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 48px;
     margin-bottom: 20px;
 }
 
-p {
-    font-size: 18px;
+.hero p {
+    font-size: 20px;
     line-height: 1.6;
+    margin-bottom: 35px;
+}
+
+.button {
+    display: inline-block;
+    padding: 14px 28px;
+    text-decoration: none;
+    background: #1f2937;
+    color: white;
+    border-radius: 6px;
 }
