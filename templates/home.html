@@ -33,6 +33,22 @@
 
         <a href="#" class="button">Get Started</a>
 
+        {% if error %}
+            <p>{{ error }}</p>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <form action="{% url 'upload_dataset' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <input type="file" name="dataset" accept=".csv" required>
+
+                <button type="submit">Upload Dataset</button>
+            </form>
+        {% else %}
+            <p>Please login to upload an employee dataset.</p>
+        {% endif %}
+
     </main>
 
 </body>

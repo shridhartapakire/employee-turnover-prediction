@@ -6,6 +6,11 @@ class AnalysisResult(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     upload_filename = models.CharField(max_length=255)
     analysis_date = models.DateTimeField(auto_now_add=True)
+    uploaded_file = models.FileField(
+        upload_to="datasets/",
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return f"{self.upload_filename} - {self.user.username}"
