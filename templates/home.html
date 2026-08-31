@@ -18,7 +18,7 @@
 
         <div class="nav-links">
             <a href="/">Home</a>
-            <a href="#">Login</a>
+            <a href="{% url 'login' %}">Login</a>
         </div>
     </nav>
 
@@ -31,7 +31,7 @@
             using Machine Learning.
         </p>
 
-        <a href="#" class="button">Get Started</a>
+        <a href="{% url 'login' %}" class="button">Get Started</a>
 
         {% if error %}
             <p>{{ error }}</p>
