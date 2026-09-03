@@ -3,6 +3,7 @@ import pandas as pd
 from django.shortcuts import redirect, render
 
 from .models import AnalysisResult
+from ml.predictor import train_model, predict_turnover
 
 
 def home(request):
@@ -10,46 +11,79 @@ def home(request):
 
 
 def upload_dataset(request):
-    if request.method == "POST":
-        uploaded_file = request.FILES.get("dataset")
+    if request.method != "POST":
+        return redirect("home")
 
-        if not uploaded_file:
+    uploaded_file = request.FILES.get("dataset")
+
+    if not uploaded_file:
+        return render(
+            request,
+            "home.html",
+            {"error": "Please select a file."},
+        )
+
+    if not uploaded_file.name.lower().endswith(".csv"):
+        return render(
+            request,
+            "home.html",
+            {"error": "Please upload a CSV file."},
+        )
+
+    try:
+        dataframe = pd.read_csv(uploaded_file)
+
+        if dataframe.empty:
             return render(
                 request,
                 "home.html",
-                {"error": "Please select a file."},
+                {"error": "The uploaded CSV is empty."},
             )
 
-        if not uploaded_file.name.lower().endswith(".csv"):
-            return render(
-                request,
-                "home.html",
-                {"error": "Please upload a CSV file."},
-            )
+        model = train_model(dataframe)
 
-        try:
-            dataframe = pd.read_csv(uploaded_file)
+        prediction_data = dataframe.drop(columns=["left"])
 
-            if dataframe.empty:
-                return render(
-                    request,
-                    "home.html",
-                    {"error": "The uploaded CSV is empty."},
-                )
+        results = predict_turnover(
+            model,
+            prediction_data,
+        )
 
-            AnalysisResult.objects.create(
-                user=request.user,
-                upload_filename=uploaded_file.name,
-                uploaded_file=uploaded_file,
-            )
+        turnover_count = int(
+            results["Predicted_Turnover"].sum()
+        )
 
-            return redirect("home")
+        average_probability = round(
+            results["Turnover_Probability"].mean() * 100,
+            2,
+        )
 
-        except Exception:
-            return render(
-                request,
-                "home.html",
-                {"error": "Unable to read the CSV file."},
-            )
+        AnalysisResult.objects.create(
+            user=request.user,
+            upload_filename=uploaded_file.name,
+            uploaded_file=uploaded_file,
+        )
 
-    return redirect("home")
+        return render(
+            request,
+            "prediction_result.html",
+            {
+                "filename": uploaded_file.name,
+                "turnover_count": turnover_count,
+                "average_probability": average_probability,
+            },
+        )
+
+    except ValueError as error:
+        return render(
+            request,
+            "home.html",
+            {"error": str(error)},
+        )
+
+    except Exception:
+        return render(
+            request,
+            "home.html",
+            {"error": "Unable to process the dataset."},
+        )
