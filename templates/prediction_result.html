@@ -36,6 +36,38 @@
         <h2>{{ average_probability }}%</h2>
         <p>Average turnover probability</p>
 
+        <h2>Employee Predictions</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Predicted Turnover</th>
+                    <th>Turnover Probability</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for employee in employee_results %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>
+                        {% if employee.Predicted_Turnover == 1 %}
+                            Likely to Leave
+                        {% else %}
+                            Likely to Stay
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ employee.Turnover_Probability }}%
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <a href="{% url 'home' %}" class="button">
             Back to Home
         </a>

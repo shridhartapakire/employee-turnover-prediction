@@ -49,6 +49,14 @@ def upload_dataset(request):
             prediction_data,
         )
 
+        results["Turnover_Probability"] = (
+            results["Turnover_Probability"] * 100
+        ).round(2)
+
+        employee_results = results[
+            ["Predicted_Turnover", "Turnover_Probability"]
+        ].to_dict("records")
+
         turnover_count = int(
             results["Predicted_Turnover"].sum()
         )
@@ -71,6 +79,7 @@ def upload_dataset(request):
                 "filename": uploaded_file.name,
                 "turnover_count": turnover_count,
                 "average_probability": average_probability,
+                "employee_results": employee_results,
             },
         )
 
