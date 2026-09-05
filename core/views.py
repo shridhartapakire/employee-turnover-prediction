@@ -96,3 +96,16 @@ def upload_dataset(request):
             "home.html",
             {"error": "Unable to process the dataset."},
         )
+
+
+def prediction_history(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    analyses = AnalysisResult.objects.filter(user=request.user)
+
+    return render(
+        request,
+        "prediction_history.html",
+        {"analyses": analyses},
+    )

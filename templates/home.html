@@ -19,6 +19,9 @@
         <div class="nav-links">
             <a href="/">Home</a>
             <a href="{% url 'login' %}">Login</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'prediction_history' %}">History</a>
+            {% endif %}
         </div>
     </nav>
 
