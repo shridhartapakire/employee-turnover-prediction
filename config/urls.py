@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
-from core.views import home, upload_dataset, prediction_history
+from core.views import home, upload_dataset, prediction_history, dashboard
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -27,6 +27,7 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("upload/", upload_dataset, name="upload_dataset"),
     path("history/", prediction_history, name="prediction_history"),
+    path("dashboard/", dashboard, name="dashboard"),
 ]
 
 if settings.DEBUG:

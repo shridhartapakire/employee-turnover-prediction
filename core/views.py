@@ -109,3 +109,18 @@ def prediction_history(request):
         "prediction_history.html",
         {"analyses": analyses},
     )
+
+def dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    analyses = AnalysisResult.objects.filter(user=request.user)
+
+    latest_analysis = analyses.first()
+
+    context = {
+        "total_analyses": analyses.count(),
+        "latest_analysis": latest_analysis,
+    }
+
+    return render(request, "dashboard.html", context)
