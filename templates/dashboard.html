@@ -33,6 +33,17 @@
     </div>
 
     {% if latest_analysis %}
+
+        <div>
+            <h2>{{ latest_analysis.predicted_turnover_count }}</h2>
+            <p>Employees Predicted to Leave</p>
+        </div>
+
+        <div>
+            <h2>{{ latest_analysis.average_turnover_probability }}%</h2>
+            <p>Average Turnover Probability</p>
+        </div>
+
         <h2>Latest Analysis</h2>
 
         <p>
@@ -44,8 +55,11 @@
             Date:
             {{ latest_analysis.analysis_date|date:"d M Y, H:i" }}
         </p>
+
     {% else %}
+
         <p>No analysis has been performed yet.</p>
+
     {% endif %}
 
     <br>
