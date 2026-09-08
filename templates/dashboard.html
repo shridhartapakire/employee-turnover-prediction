@@ -27,21 +27,25 @@
 
     <p>Employee turnover analysis overview</p>
 
-    <div>
-        <h2>{{ total_analyses }}</h2>
-        <p>Total Analyses</p>
-    </div>
-
     {% if latest_analysis %}
 
-        <div>
-            <h2>{{ latest_analysis.predicted_turnover_count }}</h2>
-            <p>Employees Predicted to Leave</p>
-        </div>
+        <div class="dashboard-cards">
 
-        <div>
-            <h2>{{ latest_analysis.average_turnover_probability }}%</h2>
-            <p>Average Turnover Probability</p>
+            <div class="kpi-card">
+                <h2>{{ latest_analysis.total_employees }}</h2>
+                <p>Total Employees Analyzed</p>
+            </div>
+
+            <div class="kpi-card">
+                <h2>{{ latest_analysis.predicted_turnover_count }}</h2>
+                <p>Employees Predicted to Leave</p>
+            </div>
+
+            <div class="kpi-card">
+                <h2>{{ latest_analysis.average_turnover_probability }}%</h2>
+                <p>Average Turnover Probability</p>
+            </div>
+
         </div>
 
         <h2>Latest Analysis</h2>

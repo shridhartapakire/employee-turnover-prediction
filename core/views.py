@@ -70,6 +70,7 @@ def upload_dataset(request):
             user=request.user,
             upload_filename=uploaded_file.name,
             uploaded_file=uploaded_file,
+            total_employees=len(dataframe),
             predicted_turnover_count=turnover_count,
             average_turnover_probability=average_probability,
         )

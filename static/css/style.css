@@ -67,3 +67,29 @@ td {
 th {
     font-weight: bold;
 }
+
+.dashboard-cards {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+}
+
+.kpi-card {
+    background: white;
+    padding: 25px;
+    width: 220px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-card h2 {
+    font-size: 32px;
+    margin: 0 0 10px;
+}
+
+.kpi-card p {
+    margin: 0;
+    font-size: 16px;
+}

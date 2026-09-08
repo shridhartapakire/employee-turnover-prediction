@@ -6,7 +6,8 @@ class AnalysisResult(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     upload_filename = models.CharField(max_length=255)
     uploaded_file = models.FileField(upload_to="datasets/", blank=True, null=True)
-    
+
+    total_employees = models.PositiveIntegerField(default=0)
     predicted_turnover_count = models.PositiveIntegerField(default=0)
     average_turnover_probability = models.FloatField(default=0.0)
 
