@@ -62,7 +62,7 @@ def upload_dataset(request):
         )
 
         average_probability = round(
-            results["Turnover_Probability"].mean() * 100,
+            results["Turnover_Probability"].mean(),
             2,
         )
 
