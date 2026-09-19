@@ -1,5 +1,6 @@
 import pandas as pd
 
+from django.contrib import messages
 from django.shortcuts import redirect, render
 
 from .models import AnalysisResult
@@ -23,21 +24,33 @@ def upload_dataset(request):
             {"error": "Please select a file."},
         )
 
-    if not uploaded_file.name.lower().endswith(".csv"):
-        return render(
+    file_extension = uploaded_file.name.lower().split(".")[-1]
+
+    if file_extension not in ["csv", "xlsx", "xls"]:
+        messages.error(
             request,
-            "home.html",
-            {"error": "Please upload a CSV file."},
+            "Please upload a CSV or Excel file."
         )
+        return redirect("home")
 
     try:
-        dataframe = pd.read_csv(uploaded_file)
+
+        if file_extension == "csv":
+            dataframe = pd.read_csv(uploaded_file)
+
+        elif file_extension in ["xlsx", "xls"]:
+            dataframe = pd.read_excel(uploaded_file)
+
+        else:
+            raise ValueError(
+                "Unsupported file type. Please upload CSV or Excel file."
+            )
 
         if dataframe.empty:
             return render(
                 request,
                 "home.html",
-                {"error": "The uploaded CSV is empty."},
+                {"error": "The uploaded CSV or Excel file is empty."},
             )
 
         model = train_model(dataframe)
