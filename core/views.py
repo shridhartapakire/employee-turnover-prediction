@@ -53,6 +53,20 @@ def upload_dataset(request):
                 {"error": "The uploaded CSV or Excel file is empty."},
             )
 
+        if "left" not in dataframe.columns:
+            return render(
+                request,
+                "home.html",
+                {"error": "Dataset must contain a 'left' column."},
+            )
+
+        if dataframe["left"].nunique() < 2:
+            return render(
+                request,
+                "home.html",
+                {"error": "The 'left' column must contain both 0 and 1 values."},
+            )
+
         model = train_model(dataframe)
 
         prediction_data = dataframe.drop(columns=["left"])
