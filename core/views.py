@@ -89,7 +89,12 @@ def upload_dataset(request):
         )
 
         average_probability = round(
-            results["Turnover_Probability"].mean() ,
+            results["Turnover_Probability"].mean(),
+            2,
+        )
+
+        turnover_percentage = round(
+            (turnover_count / len(dataframe)) * 100,
             2,
         )
 
@@ -108,6 +113,7 @@ def upload_dataset(request):
             {
                 "filename": uploaded_file.name,
                 "turnover_count": turnover_count,
+                "turnover_percentage": turnover_percentage,
                 "average_probability": average_probability,
                 "employee_results": employee_results,
             },
@@ -148,9 +154,21 @@ def dashboard(request):
 
     latest_analysis = analyses.first()
 
+    turnover_percentage = 0
+
+    if latest_analysis and latest_analysis.total_employees > 0:
+        turnover_percentage = round(
+            (
+                latest_analysis.predicted_turnover_count
+                / latest_analysis.total_employees
+            ) * 100,
+            2,
+        )
+
     context = {
         "total_analyses": analyses.count(),
         "latest_analysis": latest_analysis,
+        "turnover_percentage": turnover_percentage,
     }
 
     return render(request, "dashboard.html", context)
