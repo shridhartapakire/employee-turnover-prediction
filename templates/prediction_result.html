@@ -41,6 +41,31 @@
             <p>{{ turnover_percentage }}%</p>
         </div>
 
+        <h2>Department Analysis</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Department</th>
+                    <th>Total Employees</th>
+                    <th>Predicted Turnover</th>
+                    <th>Turnover Percentage</th>
+                    <th>Average Probability</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for department in department_analysis %}
+                <tr>
+                    <td>{{ department.Department }}</td>
+                    <td>{{ department.total_employees }}</td>
+                    <td>{{ department.predicted_turnover }}</td>
+                    <td>{{ department.turnover_percentage }}%</td>
+                    <td>{{ department.average_probability }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
         <h2>Employee Predictions</h2>
 
