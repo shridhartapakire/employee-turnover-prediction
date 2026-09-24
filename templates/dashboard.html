@@ -65,6 +65,26 @@
             {{ latest_analysis.analysis_date|date:"d M Y, H:i" }}
         </p>
 
+        <h2>Department Summary</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Department</th>
+                    <th>Employees</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for department in department_summary %}
+                <tr>
+                    <td>{{ department.Department }}</td>
+                    <td>{{ department.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
     {% else %}
 
         <p>No analysis has been performed yet.</p>

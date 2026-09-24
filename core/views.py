@@ -183,6 +183,25 @@ def dashboard(request):
 
     latest_analysis = analyses.first()
 
+    department_summary = []
+
+    if latest_analysis:
+        try:
+            dataframe = pd.read_csv(
+                latest_analysis.uploaded_file.path
+            )
+
+            if "Department" in dataframe.columns:
+                department_summary = (
+                    dataframe["Department"]
+                    .value_counts()
+                    .reset_index()
+                    .to_dict("records")
+                )
+
+        except Exception:
+            department_summary = []
+
     turnover_percentage = 0
 
     if latest_analysis and latest_analysis.total_employees > 0:
@@ -198,6 +217,7 @@ def dashboard(request):
         "total_analyses": analyses.count(),
         "latest_analysis": latest_analysis,
         "turnover_percentage": turnover_percentage,
+        "department_summary": department_summary,
     }
 
     return render(request, "dashboard.html", context)
