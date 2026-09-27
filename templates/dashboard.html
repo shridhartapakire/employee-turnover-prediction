@@ -85,6 +85,26 @@
             </tbody>
         </table>
 
+        <h2>Job Role Summary</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Job Role</th>
+                    <th>Employees</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for role in job_role_summary %}
+                <tr>
+                    <td>{{ role.JobRole }}</td>
+                    <td>{{ role.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
     {% else %}
 
         <p>No analysis has been performed yet.</p>

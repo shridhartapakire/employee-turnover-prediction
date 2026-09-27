@@ -202,7 +202,22 @@ def dashboard(request):
         except Exception:
             department_summary = []
 
-    turnover_percentage = 0
+    job_role_summary = []
+
+    if latest_analysis:
+        try:
+            if "JobRole" in dataframe.columns:
+                job_role_summary = (
+                    dataframe["JobRole"]
+                    .value_counts()
+                    .reset_index()
+                    .to_dict("records")
+                )
+
+        except Exception:
+            job_role_summary = []    
+
+        turnover_percentage = 0
 
     if latest_analysis and latest_analysis.total_employees > 0:
         turnover_percentage = round(
@@ -218,6 +233,7 @@ def dashboard(request):
         "latest_analysis": latest_analysis,
         "turnover_percentage": turnover_percentage,
         "department_summary": department_summary,
+        "job_role_summary": job_role_summary,
     }
 
     return render(request, "dashboard.html", context)
