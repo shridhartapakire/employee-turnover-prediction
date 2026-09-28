@@ -101,6 +101,7 @@
                     <th>Employee</th>
                     <th>Predicted Turnover</th>
                     <th>Turnover Probability</th>
+                    <th>Risk Level</th>
                 </tr>
             </thead>
 
@@ -119,6 +120,10 @@
 
                     <td>
                         {{ employee.Turnover_Probability }}%
+                    </td>
+
+                    <td>
+                        {{ employee.Risk_Level }}
                     </td>
                 </tr>
                 {% endfor %}

@@ -80,8 +80,19 @@ def upload_dataset(request):
             results["Turnover_Probability"] * 100
         ).round(2)
 
+        results["Risk_Level"] = results["Turnover_Probability"].apply(
+            lambda probability:
+                "High Risk" if probability >= 70
+                else "Medium Risk" if probability >= 40
+                else "Low Risk"
+        )
+
         employee_results = results[
-            ["Predicted_Turnover", "Turnover_Probability"]
+            [
+                "Predicted_Turnover",
+                "Turnover_Probability",
+                "Risk_Level",
+            ]
         ].to_dict("records")
 
         department_analysis = []
