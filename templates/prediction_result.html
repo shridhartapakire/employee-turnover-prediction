@@ -67,6 +67,32 @@
             </tbody>
         </table>
 
+        <h2>Job Role Turnover Analysis</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Job Role</th>
+                    <th>Total Employees</th>
+                    <th>Predicted Turnover</th>
+                    <th>Turnover Percentage</th>
+                    <th>Average Probability</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for role in job_role_analysis %}
+                <tr>
+                    <td>{{ role.JobRole }}</td>
+                    <td>{{ role.total_employees }}</td>
+                    <td>{{ role.predicted_turnover }}</td>
+                    <td>{{ role.turnover_percentage }}%</td>
+                    <td>{{ role.average_probability }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <h2>Employee Predictions</h2>
 
         <table>

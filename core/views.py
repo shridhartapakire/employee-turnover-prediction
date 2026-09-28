@@ -112,6 +112,35 @@ def upload_dataset(request):
 
             department_analysis = department_summary.to_dict("records")
 
+        job_role_analysis = []
+
+        if "JobRole" in dataframe.columns:
+            results["JobRole"] = dataframe["JobRole"].values
+
+            job_role_summary = (
+                results.groupby("JobRole")
+                .agg(
+                    total_employees=("Predicted_Turnover", "count"),
+                    predicted_turnover=("Predicted_Turnover", "sum"),
+                    average_probability=("Turnover_Probability", "mean"),
+                )
+                .reset_index()
+            )
+
+            job_role_summary["turnover_percentage"] = (
+                job_role_summary["predicted_turnover"]
+                / job_role_summary["total_employees"]
+                * 100
+            ).round(2)
+
+            job_role_summary["average_probability"] = (
+                job_role_summary["average_probability"]
+                .round(2)
+            )
+
+            job_role_analysis = job_role_summary.to_dict("records")
+                
+
         turnover_count = int(
             results["Predicted_Turnover"].sum()
         )
@@ -145,6 +174,7 @@ def upload_dataset(request):
                 "average_probability": average_probability,
                 "employee_results": employee_results,
                 "department_analysis": department_analysis,
+                "job_role_analysis": job_role_analysis,
             },
         )
 
