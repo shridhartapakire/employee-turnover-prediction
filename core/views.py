@@ -80,6 +80,27 @@ def upload_dataset(request):
             results["Turnover_Probability"] * 100
         ).round(2)
 
+        TURNOVER_COST_MULTIPLIER = 1.5
+
+        results["Estimated_Turnover_Cost"] = 0.0
+
+        if "MonthlyIncome" in results.columns:
+            results["Estimated_Turnover_Cost"] = (
+                results["MonthlyIncome"].astype(float)
+                * 12
+                * TURNOVER_COST_MULTIPLIER
+            )
+
+            results.loc[
+                results["Predicted_Turnover"] == 0,
+                "Estimated_Turnover_Cost"
+            ] = 0.0
+
+        total_turnover_cost = round(
+            results["Estimated_Turnover_Cost"].sum(),
+            2,
+        )
+
         results["Risk_Level"] = results["Turnover_Probability"].apply(
             lambda probability:
                 "High Risk" if probability >= 70
@@ -92,6 +113,7 @@ def upload_dataset(request):
                 "Predicted_Turnover",
                 "Turnover_Probability",
                 "Risk_Level",
+                "Estimated_Turnover_Cost",
             ]
         ].to_dict("records")
 
@@ -183,6 +205,7 @@ def upload_dataset(request):
                 "turnover_count": turnover_count,
                 "turnover_percentage": turnover_percentage,
                 "average_probability": average_probability,
+                "total_turnover_cost": total_turnover_cost,
                 "employee_results": employee_results,
                 "department_analysis": department_analysis,
                 "job_role_analysis": job_role_analysis,
