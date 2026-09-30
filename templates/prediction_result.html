@@ -41,6 +41,11 @@
             <p>{{ turnover_percentage }}%</p>
         </div>
 
+        <div class="kpi-card">
+            <h3>Estimated Turnover Cost</h3>
+            <p>{{ total_turnover_cost|floatformat:2 }}</p>
+        </div>
+
         <h2>Department Analysis</h2>
 
         <table>
@@ -51,6 +56,7 @@
                     <th>Predicted Turnover</th>
                     <th>Turnover Percentage</th>
                     <th>Average Probability</th>
+                    <th>Estimated Turnover Cost</th>
                 </tr>
             </thead>
 
@@ -62,6 +68,9 @@
                     <td>{{ department.predicted_turnover }}</td>
                     <td>{{ department.turnover_percentage }}%</td>
                     <td>{{ department.average_probability }}%</td>
+                    <td>
+                        {{ department.estimated_turnover_cost|floatformat:2 }}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -141,14 +150,5 @@
 
     </main>
 
-    <div class="kpi-card">
-        <h3>Turnover Percentage</h3>
-        <p>{{ turnover_percentage }}%</p>
-    </div>
-
-    <div class="kpi-card">
-        <h3>Estimated Turnover Cost</h3>
-        <p>{{ total_turnover_cost|floatformat:2 }}</p>
-    </div>
 </body>
 </html>

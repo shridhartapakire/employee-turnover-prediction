@@ -27,14 +27,10 @@ def upload_dataset(request):
     file_extension = uploaded_file.name.lower().split(".")[-1]
 
     if file_extension not in ["csv", "xlsx", "xls"]:
-        messages.error(
-            request,
-            "Please upload a CSV or Excel file."
-        )
+        messages.error(request, "Please upload a CSV or Excel file.")
         return redirect("home")
 
     try:
-
         if file_extension == "csv":
             dataframe = pd.read_csv(uploaded_file)
 
@@ -42,9 +38,7 @@ def upload_dataset(request):
             dataframe = pd.read_excel(uploaded_file)
 
         else:
-            raise ValueError(
-                "Unsupported file type. Please upload CSV or Excel file."
-            )
+            raise ValueError("Unsupported file type. Please upload CSV or Excel file.")
 
         if dataframe.empty:
             return render(
@@ -64,7 +58,7 @@ def upload_dataset(request):
             return render(
                 request,
                 "home.html",
-                {"error": "The 'left' column must contain both 0 and 1 values."},
+                {"error": ("The 'left' column must contain both 0 and 1 values.")},
             )
 
         model = train_model(dataframe)
@@ -76,24 +70,22 @@ def upload_dataset(request):
             prediction_data,
         )
 
-        results["Turnover_Probability"] = (
-            results["Turnover_Probability"] * 100
-        ).round(2)
+        results["Turnover_Probability"] = (results["Turnover_Probability"] * 100).round(
+            2
+        )
 
+        # Estimated turnover cost
         TURNOVER_COST_MULTIPLIER = 1.5
 
         results["Estimated_Turnover_Cost"] = 0.0
 
         if "MonthlyIncome" in results.columns:
             results["Estimated_Turnover_Cost"] = (
-                results["MonthlyIncome"].astype(float)
-                * 12
-                * TURNOVER_COST_MULTIPLIER
+                results["MonthlyIncome"].astype(float) * 12 * TURNOVER_COST_MULTIPLIER
             )
 
             results.loc[
-                results["Predicted_Turnover"] == 0,
-                "Estimated_Turnover_Cost"
+                results["Predicted_Turnover"] == 0, "Estimated_Turnover_Cost"
             ] = 0.0
 
         total_turnover_cost = round(
@@ -101,11 +93,13 @@ def upload_dataset(request):
             2,
         )
 
+        # Employee retention risk level
         results["Risk_Level"] = results["Turnover_Probability"].apply(
-            lambda probability:
-                "High Risk" if probability >= 70
-                else "Medium Risk" if probability >= 40
-                else "Low Risk"
+            lambda probability: (
+                "High Risk"
+                if probability >= 70
+                else "Medium Risk" if probability >= 40 else "Low Risk"
+            )
         )
 
         employee_results = results[
@@ -117,6 +111,7 @@ def upload_dataset(request):
             ]
         ].to_dict("records")
 
+        # Department analysis
         department_analysis = []
 
         if "Department" in dataframe.columns:
@@ -128,6 +123,10 @@ def upload_dataset(request):
                     total_employees=("Predicted_Turnover", "count"),
                     predicted_turnover=("Predicted_Turnover", "sum"),
                     average_probability=("Turnover_Probability", "mean"),
+                    estimated_turnover_cost=(
+                        "Estimated_Turnover_Cost",
+                        "sum",
+                    ),
                 )
                 .reset_index()
             )
@@ -138,13 +137,17 @@ def upload_dataset(request):
                 * 100
             ).round(2)
 
-            department_summary["average_probability"] = (
-                department_summary["average_probability"]
-                .round(2)
-            )
+            department_summary["average_probability"] = department_summary[
+                "average_probability"
+            ].round(2)
+
+            department_summary["estimated_turnover_cost"] = department_summary[
+                "estimated_turnover_cost"
+            ].round(2)
 
             department_analysis = department_summary.to_dict("records")
 
+        # Job role analysis
         job_role_analysis = []
 
         if "JobRole" in dataframe.columns:
@@ -166,17 +169,13 @@ def upload_dataset(request):
                 * 100
             ).round(2)
 
-            job_role_summary["average_probability"] = (
-                job_role_summary["average_probability"]
-                .round(2)
-            )
+            job_role_summary["average_probability"] = job_role_summary[
+                "average_probability"
+            ].round(2)
 
             job_role_analysis = job_role_summary.to_dict("records")
-                
 
-        turnover_count = int(
-            results["Predicted_Turnover"].sum()
-        )
+        turnover_count = int(results["Predicted_Turnover"].sum())
 
         average_probability = round(
             results["Turnover_Probability"].mean(),
@@ -239,6 +238,7 @@ def prediction_history(request):
         {"analyses": analyses},
     )
 
+
 def dashboard(request):
     if not request.user.is_authenticated:
         return redirect("login")
@@ -248,12 +248,12 @@ def dashboard(request):
     latest_analysis = analyses.first()
 
     department_summary = []
+    job_role_summary = []
+    turnover_percentage = 0
 
     if latest_analysis:
         try:
-            dataframe = pd.read_csv(
-                latest_analysis.uploaded_file.path
-            )
+            dataframe = pd.read_csv(latest_analysis.uploaded_file.path)
 
             if "Department" in dataframe.columns:
                 department_summary = (
@@ -263,32 +263,19 @@ def dashboard(request):
                     .to_dict("records")
                 )
 
-        except Exception:
-            department_summary = []
-
-    job_role_summary = []
-
-    if latest_analysis:
-        try:
             if "JobRole" in dataframe.columns:
                 job_role_summary = (
-                    dataframe["JobRole"]
-                    .value_counts()
-                    .reset_index()
-                    .to_dict("records")
+                    dataframe["JobRole"].value_counts().reset_index().to_dict("records")
                 )
 
         except Exception:
-            job_role_summary = []    
-
-        turnover_percentage = 0
+            department_summary = []
+            job_role_summary = []
 
     if latest_analysis and latest_analysis.total_employees > 0:
         turnover_percentage = round(
-            (
-                latest_analysis.predicted_turnover_count
-                / latest_analysis.total_employees
-            ) * 100,
+            (latest_analysis.predicted_turnover_count / latest_analysis.total_employees)
+            * 100,
             2,
         )
 
