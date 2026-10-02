@@ -112,6 +112,7 @@
                     <th>Turnover Probability</th>
                     <th>Risk Level</th>
                     <th>Estimated Cost</th>
+                    <th>Retention Priority</th>
                 </tr>
             </thead>
 
@@ -139,6 +140,11 @@
                     <td>
                         {{ employee.Estimated_Turnover_Cost|floatformat:2 }}
                     </td>
+
+                    <td>
+                        {{ employee.Retention_Priority|floatformat:2 }}
+                    </td>
+                    
                 </tr>
                 {% endfor %}
             </tbody>

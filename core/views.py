@@ -93,6 +93,12 @@ def upload_dataset(request):
             2,
         )
 
+        results["Retention_Priority"] = (
+            results["Turnover_Probability"]
+            * 0.01
+            * results["Estimated_Turnover_Cost"]
+        ).round(2)
+
         # Employee retention risk level
         results["Risk_Level"] = results["Turnover_Probability"].apply(
             lambda probability: (
@@ -108,6 +114,7 @@ def upload_dataset(request):
                 "Turnover_Probability",
                 "Risk_Level",
                 "Estimated_Turnover_Cost",
+                "Retention_Priority",
             ]
         ].to_dict("records")
 
