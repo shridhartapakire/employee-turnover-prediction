@@ -9,6 +9,7 @@
     <title>Prediction Results</title>
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -75,6 +76,12 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <h2>Predicted Turnover by Department</h2>
+
+        <div style="max-width: 800px; margin: 30px auto;">
+            <canvas id="departmentTurnoverChart"></canvas>
+        </div>
 
         <h2>Job Role Turnover Analysis</h2>
 
@@ -155,6 +162,47 @@
         </a>
 
     </main>
+
+    {{ department_chart_labels|json_script:"department-chart-labels" }}
+    {{ department_chart_values|json_script:"department-chart-values" }}
+
+    <script>
+        const departmentLabels = JSON.parse(
+            document.getElementById("department-chart-labels").textContent
+        );
+
+        const departmentValues = JSON.parse(
+            document.getElementById("department-chart-values").textContent
+        );
+
+        const departmentChart = document.getElementById(
+            "departmentTurnoverChart"
+        );
+
+        new Chart(departmentChart, {
+            type: "bar",
+            data: {
+                labels: departmentLabels,
+                datasets: [
+                    {
+                        label: "Predicted Turnover",
+                        data: departmentValues,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>
