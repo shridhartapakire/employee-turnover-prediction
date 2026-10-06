@@ -214,6 +214,14 @@ def upload_dataset(request):
                 "total_turnover_cost": total_turnover_cost,
                 "employee_results": employee_results,
                 "department_analysis": department_analysis,
+                "department_chart_labels": [
+                    department["Department"]
+                    for department in department_analysis
+                ],
+                "department_chart_values": [
+                    department["predicted_turnover"]
+                    for department in department_analysis
+                ],
                 "job_role_analysis": job_role_analysis,
             },
         )
@@ -260,20 +268,33 @@ def dashboard(request):
 
     if latest_analysis:
         try:
-            dataframe = pd.read_csv(latest_analysis.uploaded_file.path)
+            file_extension = latest_analysis.upload_filename.lower().split(".")[-1]
 
-            if "Department" in dataframe.columns:
-                department_summary = (
-                    dataframe["Department"]
-                    .value_counts()
-                    .reset_index()
-                    .to_dict("records")
-                )
+            if file_extension == "csv":
+                dataframe = pd.read_csv(latest_analysis.uploaded_file.path)
 
-            if "JobRole" in dataframe.columns:
-                job_role_summary = (
-                    dataframe["JobRole"].value_counts().reset_index().to_dict("records")
-                )
+            elif file_extension in ["xlsx", "xls"]:
+                dataframe = pd.read_excel(latest_analysis.uploaded_file.path)
+
+            else:
+                dataframe = None
+
+            if dataframe is not None:
+                if "Department" in dataframe.columns:
+                    department_summary = (
+                        dataframe["Department"]
+                        .value_counts()
+                        .reset_index()
+                        .to_dict("records")
+                    )
+
+                if "JobRole" in dataframe.columns:
+                    job_role_summary = (
+                        dataframe["JobRole"]
+                        .value_counts()
+                        .reset_index()
+                        .to_dict("records")
+                    )
 
         except Exception:
             department_summary = []
