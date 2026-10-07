@@ -47,6 +47,11 @@
             <p>{{ total_turnover_cost|floatformat:2 }}</p>
         </div>
 
+        <div class="kpi-card">
+            <h3>Average Efficiency</h3>
+            <p>{{ average_efficiency }}%</p>
+        </div>
+
         <h2>Department Analysis</h2>
 
         <table>
@@ -120,6 +125,7 @@
                     <th>Risk Level</th>
                     <th>Estimated Cost</th>
                     <th>Retention Priority</th>
+                    <th>Efficiency Score</th>
                 </tr>
             </thead>
 
@@ -150,6 +156,10 @@
 
                     <td>
                         {{ employee.Retention_Priority|floatformat:2 }}
+                    </td>
+                    
+                    <td>
+                        {{ employee.Efficiency_Score|floatformat:2 }}%
                     </td>
                     
                 </tr>

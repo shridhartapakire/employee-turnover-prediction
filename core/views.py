@@ -108,6 +108,42 @@ def upload_dataset(request):
             )
         )
 
+                # Workforce efficiency proxy
+        efficiency_columns = [
+            "JobInvolvement",
+            "PerformanceRating",
+            "JobLevel",
+            "YearsAtCompany",
+        ]
+
+        available_efficiency_columns = [
+            column
+            for column in efficiency_columns
+            if column in results.columns
+        ]
+
+        if available_efficiency_columns:
+            efficiency_data = results[available_efficiency_columns].copy()
+
+            for column in available_efficiency_columns:
+                minimum = efficiency_data[column].min()
+                maximum = efficiency_data[column].max()
+
+                if maximum != minimum:
+                    efficiency_data[column] = (
+                        (efficiency_data[column] - minimum)
+                        / (maximum - minimum)
+                    ) * 100
+                else:
+                    efficiency_data[column] = 50
+
+            results["Efficiency_Score"] = (
+                efficiency_data.mean(axis=1)
+            ).round(2)
+
+        else:
+            results["Efficiency_Score"] = 0.0
+
         employee_results = results[
             [
                 "Predicted_Turnover",
@@ -115,6 +151,7 @@ def upload_dataset(request):
                 "Risk_Level",
                 "Estimated_Turnover_Cost",
                 "Retention_Priority",
+                "Efficiency_Score",
             ]
         ].to_dict("records")
 
@@ -189,6 +226,11 @@ def upload_dataset(request):
             2,
         )
 
+        average_efficiency = round(
+            results["Efficiency_Score"].mean(),
+            2,
+        )
+
         turnover_percentage = round(
             (turnover_count / len(dataframe)) * 100,
             2,
@@ -223,6 +265,7 @@ def upload_dataset(request):
                     for department in department_analysis
                 ],
                 "job_role_analysis": job_role_analysis,
+                "average_efficiency": average_efficiency,
             },
         )
 
