@@ -167,10 +167,8 @@ def upload_dataset(request):
                     total_employees=("Predicted_Turnover", "count"),
                     predicted_turnover=("Predicted_Turnover", "sum"),
                     average_probability=("Turnover_Probability", "mean"),
-                    estimated_turnover_cost=(
-                        "Estimated_Turnover_Cost",
-                        "sum",
-                    ),
+                    estimated_turnover_cost=("Estimated_Turnover_Cost","sum",),
+                    average_efficiency=("Efficiency_Score", "mean"),
                 )
                 .reset_index()
             )
@@ -183,6 +181,10 @@ def upload_dataset(request):
 
             department_summary["average_probability"] = department_summary[
                 "average_probability"
+            ].round(2)
+
+            department_summary["average_efficiency"] = department_summary[
+                "average_efficiency"
             ].round(2)
 
             department_summary["estimated_turnover_cost"] = department_summary[
@@ -262,6 +264,10 @@ def upload_dataset(request):
                 ],
                 "department_chart_values": [
                     department["predicted_turnover"]
+                    for department in department_analysis
+                ],
+                "efficiency_chart_values": [
+                    department["average_efficiency"]
                     for department in department_analysis
                 ],
                 "job_role_analysis": job_role_analysis,

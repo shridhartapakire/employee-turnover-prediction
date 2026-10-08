@@ -62,6 +62,7 @@
                     <th>Predicted Turnover</th>
                     <th>Turnover Percentage</th>
                     <th>Average Probability</th>
+                    <th>Average Efficiency</th>
                     <th>Estimated Turnover Cost</th>
                 </tr>
             </thead>
@@ -74,6 +75,7 @@
                     <td>{{ department.predicted_turnover }}</td>
                     <td>{{ department.turnover_percentage }}%</td>
                     <td>{{ department.average_probability }}%</td>
+                    <td>{{ department.average_efficiency }}%</td>
                     <td>
                         {{ department.estimated_turnover_cost|floatformat:2 }}
                     </td>
@@ -86,6 +88,12 @@
 
         <div style="max-width: 800px; margin: 30px auto;">
             <canvas id="departmentTurnoverChart"></canvas>
+        </div>
+        
+        <h2>Average Efficiency by Department</h2>
+
+        <div style="max-width: 800px; margin: 30px auto;">
+            <canvas id="departmentEfficiencyChart"></canvas>
         </div>
 
         <h2>Job Role Turnover Analysis</h2>
@@ -175,6 +183,7 @@
 
     {{ department_chart_labels|json_script:"department-chart-labels" }}
     {{ department_chart_values|json_script:"department-chart-values" }}
+    {{ efficiency_chart_values|json_script:"efficiency-chart-values" }}
 
     <script>
         const departmentLabels = JSON.parse(
@@ -183,6 +192,10 @@
 
         const departmentValues = JSON.parse(
             document.getElementById("department-chart-values").textContent
+        );
+
+        const efficiencyValues = JSON.parse(
+            document.getElementById("efficiency-chart-values").textContent
         );
 
         const departmentChart = document.getElementById(
@@ -208,6 +221,32 @@
                         ticks: {
                             precision: 0
                         }
+                    }
+                }
+            }
+        });
+
+        const efficiencyChart = document.getElementById(
+            "departmentEfficiencyChart"
+        );
+
+        new Chart(efficiencyChart, {
+            type: "bar",
+            data: {
+                labels: departmentLabels,
+                datasets: [
+                    {
+                        label: "Average Efficiency (%)",
+                        data: efficiencyValues,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
                     }
                 }
             }
