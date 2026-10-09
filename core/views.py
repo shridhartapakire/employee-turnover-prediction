@@ -221,6 +221,24 @@ def upload_dataset(request):
 
             job_role_analysis = job_role_summary.to_dict("records")
 
+            # Workforce risk summary
+            high_risk_count = int(
+                (results["Risk_Level"] == "High Risk").sum()
+            )
+
+            medium_risk_count = int(
+                (results["Risk_Level"] == "Medium Risk").sum()
+            )
+
+            low_risk_count = int(
+                (results["Risk_Level"] == "Low Risk").sum()
+            )
+
+            total_retention_priority = round(
+                results["Retention_Priority"].sum(),
+                2,
+            )
+
         turnover_count = int(results["Predicted_Turnover"].sum())
 
         average_probability = round(
@@ -272,6 +290,10 @@ def upload_dataset(request):
                 ],
                 "job_role_analysis": job_role_analysis,
                 "average_efficiency": average_efficiency,
+                "high_risk_count": high_risk_count,
+                "medium_risk_count": medium_risk_count,
+                "low_risk_count": low_risk_count,
+                "total_retention_priority": total_retention_priority,
             },
         )
 

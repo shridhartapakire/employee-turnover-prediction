@@ -27,6 +27,28 @@
 
         <h1>Prediction Results</h1>
 
+        <h2>Workforce Risk Summary</h2>
+
+        <div class="kpi-card">
+            <h3>High-Risk Employees</h3>
+            <p>{{ high_risk_count }}</p>
+        </div>
+
+        <div class="kpi-card">
+            <h3>Medium-Risk Employees</h3>
+            <p>{{ medium_risk_count }}</p>
+        </div>
+
+        <div class="kpi-card">
+            <h3>Low-Risk Employees</h3>
+            <p>{{ low_risk_count }}</p>
+        </div>
+
+        <div class="kpi-card">
+            <h3>Total Retention Priority</h3>
+            <p>{{ total_retention_priority|floatformat:2 }}</p>
+        </div>
+
         <p>
             Dataset: {{ filename }}
         </p>
