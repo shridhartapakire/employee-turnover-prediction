@@ -1,3 +1,7 @@
+import csv
+
+from django.http import HttpResponse
+
 import pandas as pd
 
 from django.contrib import messages
@@ -387,3 +391,75 @@ def dashboard(request):
     }
 
     return render(request, "dashboard.html", context)
+
+def download_predictions(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    analysis = AnalysisResult.objects.filter(
+        user=request.user
+    ).first()
+
+    if not analysis or not analysis.uploaded_file:
+        messages.error(request, "No dataset available to download.")
+        return redirect("history")
+
+    try:
+        file_extension = analysis.upload_filename.lower().split(".")[-1]
+
+        if file_extension == "csv":
+            dataframe = pd.read_csv(analysis.uploaded_file.path)
+        elif file_extension in ["xlsx", "xls"]:
+            dataframe = pd.read_excel(analysis.uploaded_file.path)
+        else:
+            messages.error(request, "Unsupported dataset format.")
+            return redirect("history")
+
+        if "left" not in dataframe.columns:
+            messages.error(request, "Dataset must contain a 'left' column.")
+            return redirect("history")
+
+        model = train_model(dataframe)
+        prediction_data = dataframe.drop(columns=["left"])
+
+        results = predict_turnover(model, prediction_data)
+        results["Turnover_Probability"] = (
+            results["Turnover_Probability"] * 100
+        ).round(2)
+
+        results["Risk_Level"] = results["Turnover_Probability"].apply(
+            lambda probability: (
+                "High Risk"
+                if probability >= 70
+                else "Medium Risk" if probability >= 40 else "Low Risk"
+            )
+        )
+
+        results["Estimated_Turnover_Cost"] = 0.0
+
+        if "MonthlyIncome" in results.columns:
+            results["Estimated_Turnover_Cost"] = (
+                results["MonthlyIncome"].astype(float) * 12 * 1.5
+            )
+            results.loc[
+                results["Predicted_Turnover"] == 0,
+                "Estimated_Turnover_Cost",
+            ] = 0.0
+
+        results["Retention_Priority"] = (
+            results["Turnover_Probability"]
+            / 100
+            * results["Estimated_Turnover_Cost"]
+        ).round(2)
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = (
+            'attachment; filename="turnover_predictions.csv"'
+        )
+
+        results.to_csv(response, index=False)
+        return response
+
+    except Exception:
+        messages.error(request, "Unable to generate the prediction download.")
+        return redirect("history")
