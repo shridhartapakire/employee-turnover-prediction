@@ -193,7 +193,7 @@ def upload_dataset(request):
 
             department_analysis = department_summary.to_dict("records")
 
-        # Job role analysis
+       # Job role analysis
         job_role_analysis = []
 
         if "JobRole" in dataframe.columns:
@@ -221,17 +221,18 @@ def upload_dataset(request):
 
             job_role_analysis = job_role_summary.to_dict("records")
 
-            # Workforce risk summary
-            high_risk_count = int((results["Risk_Level"] == "High Risk").sum())
 
-            medium_risk_count = int((results["Risk_Level"] == "Medium Risk").sum())
+        # Workforce risk summary
+        high_risk_count = int((results["Risk_Level"] == "High Risk").sum())
 
-            low_risk_count = int((results["Risk_Level"] == "Low Risk").sum())
+        medium_risk_count = int((results["Risk_Level"] == "Medium Risk").sum())
 
-            total_retention_priority = round(
-                results["Retention_Priority"].sum(),
-                2,
-            )
+        low_risk_count = int((results["Risk_Level"] == "Low Risk").sum())
+
+        total_retention_priority = round(
+            results["Retention_Priority"].sum(),
+            2,
+        )
 
         turnover_count = int(results["Predicted_Turnover"].sum())
 
