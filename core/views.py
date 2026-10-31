@@ -98,9 +98,7 @@ def upload_dataset(request):
         )
 
         results["Retention_Priority"] = (
-            results["Turnover_Probability"]
-            * 0.01
-            * results["Estimated_Turnover_Cost"]
+            results["Turnover_Probability"] * 0.01 * results["Estimated_Turnover_Cost"]
         ).round(2)
 
         # Employee retention risk level
@@ -112,7 +110,7 @@ def upload_dataset(request):
             )
         )
 
-                # Workforce efficiency proxy
+        # Workforce efficiency proxy
         efficiency_columns = [
             "JobInvolvement",
             "PerformanceRating",
@@ -121,9 +119,7 @@ def upload_dataset(request):
         ]
 
         available_efficiency_columns = [
-            column
-            for column in efficiency_columns
-            if column in results.columns
+            column for column in efficiency_columns if column in results.columns
         ]
 
         if available_efficiency_columns:
@@ -135,15 +131,12 @@ def upload_dataset(request):
 
                 if maximum != minimum:
                     efficiency_data[column] = (
-                        (efficiency_data[column] - minimum)
-                        / (maximum - minimum)
+                        (efficiency_data[column] - minimum) / (maximum - minimum)
                     ) * 100
                 else:
                     efficiency_data[column] = 50
 
-            results["Efficiency_Score"] = (
-                efficiency_data.mean(axis=1)
-            ).round(2)
+            results["Efficiency_Score"] = (efficiency_data.mean(axis=1)).round(2)
 
         else:
             results["Efficiency_Score"] = 0.0
@@ -171,7 +164,10 @@ def upload_dataset(request):
                     total_employees=("Predicted_Turnover", "count"),
                     predicted_turnover=("Predicted_Turnover", "sum"),
                     average_probability=("Turnover_Probability", "mean"),
-                    estimated_turnover_cost=("Estimated_Turnover_Cost","sum",),
+                    estimated_turnover_cost=(
+                        "Estimated_Turnover_Cost",
+                        "sum",
+                    ),
                     average_efficiency=("Efficiency_Score", "mean"),
                 )
                 .reset_index()
@@ -226,17 +222,11 @@ def upload_dataset(request):
             job_role_analysis = job_role_summary.to_dict("records")
 
             # Workforce risk summary
-            high_risk_count = int(
-                (results["Risk_Level"] == "High Risk").sum()
-            )
+            high_risk_count = int((results["Risk_Level"] == "High Risk").sum())
 
-            medium_risk_count = int(
-                (results["Risk_Level"] == "Medium Risk").sum()
-            )
+            medium_risk_count = int((results["Risk_Level"] == "Medium Risk").sum())
 
-            low_risk_count = int(
-                (results["Risk_Level"] == "Low Risk").sum()
-            )
+            low_risk_count = int((results["Risk_Level"] == "Low Risk").sum())
 
             total_retention_priority = round(
                 results["Retention_Priority"].sum(),
@@ -281,8 +271,7 @@ def upload_dataset(request):
                 "employee_results": employee_results,
                 "department_analysis": department_analysis,
                 "department_chart_labels": [
-                    department["Department"]
-                    for department in department_analysis
+                    department["Department"] for department in department_analysis
                 ],
                 "department_chart_values": [
                     department["predicted_turnover"]
@@ -392,17 +381,16 @@ def dashboard(request):
 
     return render(request, "dashboard.html", context)
 
+
 def download_predictions(request):
     if not request.user.is_authenticated:
         return redirect("login")
 
-    analysis = AnalysisResult.objects.filter(
-        user=request.user
-    ).first()
+    analysis = AnalysisResult.objects.filter(user=request.user).first()
 
     if not analysis or not analysis.uploaded_file:
         messages.error(request, "No dataset available to download.")
-        return redirect("history")
+        return redirect("prediction_history")
 
     try:
         file_extension = analysis.upload_filename.lower().split(".")[-1]
@@ -413,19 +401,19 @@ def download_predictions(request):
             dataframe = pd.read_excel(analysis.uploaded_file.path)
         else:
             messages.error(request, "Unsupported dataset format.")
-            return redirect("history")
+            return redirect("prediction_history")
 
         if "left" not in dataframe.columns:
             messages.error(request, "Dataset must contain a 'left' column.")
-            return redirect("history")
+            return redirect("prediction_history")
 
         model = train_model(dataframe)
         prediction_data = dataframe.drop(columns=["left"])
 
         results = predict_turnover(model, prediction_data)
-        results["Turnover_Probability"] = (
-            results["Turnover_Probability"] * 100
-        ).round(2)
+        results["Turnover_Probability"] = (results["Turnover_Probability"] * 100).round(
+            2
+        )
 
         results["Risk_Level"] = results["Turnover_Probability"].apply(
             lambda probability: (
@@ -447,9 +435,7 @@ def download_predictions(request):
             ] = 0.0
 
         results["Retention_Priority"] = (
-            results["Turnover_Probability"]
-            / 100
-            * results["Estimated_Turnover_Cost"]
+            results["Turnover_Probability"] / 100 * results["Estimated_Turnover_Cost"]
         ).round(2)
 
         response = HttpResponse(content_type="text/csv")
@@ -462,4 +448,4 @@ def download_predictions(request):
 
     except Exception:
         messages.error(request, "Unable to generate the prediction download.")
-        return redirect("history")
+        return redirect("prediction_history")
