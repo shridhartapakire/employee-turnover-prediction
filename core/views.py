@@ -6,6 +6,7 @@ import pandas as pd
 
 from django.contrib import messages
 from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
 
 from .models import AnalysisResult
 from ml.predictor import train_model, predict_turnover
@@ -15,6 +16,7 @@ def home(request):
     return render(request, "home.html")
 
 
+@login_required
 def upload_dataset(request):
     if request.method != "POST":
         return redirect("home")
