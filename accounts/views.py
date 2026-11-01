@@ -1,38 +1,27 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
+
+from .forms import RegisterForm
 
 
 def register_view(request):
     if request.method == "POST":
-        username = request.POST["username"]
-        email = request.POST["email"]
-        password = request.POST["password"]
-        confirm_password = request.POST["confirm_password"]
+        form = RegisterForm(request.POST)
 
-        if password != confirm_password:
-            return render(
-                request,
-                "register.html",
-                {"error": "Passwords do not match."},
-            )
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data["password"])
+            user.save()
 
-        if User.objects.filter(username=username).exists():
-            return render(
-                request,
-                "register.html",
-                {"error": "Username already exists."},
-            )
+            return redirect("login")
+    else:
+        form = RegisterForm()
 
-        User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-        )
-
-        return redirect("login")
-
-    return render(request, "register.html")
+    return render(
+        request,
+        "register.html",
+        {"form": form},
+    )
 
 
 def login_view(request):
