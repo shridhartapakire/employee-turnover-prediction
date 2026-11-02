@@ -37,6 +37,12 @@
 
         <a href="{% url 'login' %}" class="button">Get Started</a>
 
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
         {% if error %}
             <p>{{ error }}</p>
         {% endif %}

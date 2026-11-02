@@ -24,6 +24,12 @@
 
     <h1>Prediction History</h1>
 
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
     {% if analyses %}
 
     <table>
