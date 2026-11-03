@@ -25,6 +25,7 @@ from core.views import (
     prediction_history,
     dashboard,
     download_predictions,
+    download_uploaded_dataset,
 )
 
 urlpatterns = [
@@ -38,8 +39,11 @@ urlpatterns = [
     "download-predictions/",
     download_predictions,
     name="download_predictions",
-),
+    ),
+    path(
+        "dataset/<int:analysis_id>/download/",
+        download_uploaded_dataset,
+        name="download_uploaded_dataset",
+    ),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

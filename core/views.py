@@ -1,6 +1,6 @@
 import csv
 
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 
 import pandas as pd
 
@@ -452,3 +452,20 @@ def download_predictions(request):
     except Exception:
         messages.error(request, "Unable to generate the prediction download.")
         return redirect("prediction_history")
+
+@login_required
+def download_uploaded_dataset(request, analysis_id):
+    analysis = AnalysisResult.objects.filter(
+        id=analysis_id,
+        user=request.user
+    ).first()
+
+    if not analysis or not analysis.uploaded_file:
+        messages.error(request, "Dataset not found.")
+        return redirect("prediction_history")
+
+    return FileResponse(
+        analysis.uploaded_file.open("rb"),
+        as_attachment=True,
+        filename=analysis.upload_filename
+    )

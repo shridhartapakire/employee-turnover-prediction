@@ -43,7 +43,14 @@
         <tbody>
             {% for analysis in analyses %}
             <tr>
-                <td>{{ analysis.upload_filename }}</td>
+                <td>
+                    {{ analysis.upload_filename }}
+                    {% if analysis.uploaded_file %}
+                        <a href="{% url 'download_uploaded_dataset' analysis.id %}">
+                            Download Dataset
+                        </a>
+                    {% endif %}
+                </td>
                 <td>{{ analysis.analysis_date|date:"d M Y, H:i" }}</td>
             </tr>
             {% endfor %}
